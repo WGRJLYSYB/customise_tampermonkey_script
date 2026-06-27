@@ -1,0 +1,41 @@
+/* ==UserStyle==
+@name           露天电影网 (lutiandy) 广告净化
+@namespace      lutiandy-ad-cleaner
+@version        1.0.0
+@description    深度清除露天电影网页面的顽固悬浮广告、底部悬浮框等恶意占位元素。
+@author         Gavin Newsom
+@license        MIT
+@preprocessor   default
+==/UserStyle== */
+
+@-moz-document domain("www.lutiandy.com") {
+
+    /* ===================================================================
+       第一章：深度净化顽固广告 (Ad Purification)
+       =================================================================== */
+
+    /* 
+     * 针对底部固定悬浮的牛皮癣广告：
+     * 特征分析：
+     * 1. 使用高度随机化的动态 ID（如 id="_s_sfdf917cc32e_rt_177902974..."）
+     * 2. 内部通过内联的 onclick 事件调用挂载在 window 上的乱码函数（如 window['_x_rt_...']）
+     * 3. 具有极高的 z-index (99999998)
+     */
+    
+    /* 策略一：狙击特定的高频动态 ID 特征符 */
+    div[id*="_rt_"],
+    div[id^="_s_sf"]:has(img) {
+        display: none !important;
+    }
+
+    /* 策略二：利用 :has() 逆向溯源，狙击包含恶意混淆点击事件的父容器 */
+    div:has(> div[onclick*="window['_"]),
+    div:has(> div[onclick*="event.stopPropagation()"]) {
+        display: none !important;
+    }
+
+    /* 策略三：盲狙极端图层高度 (99999998 通常是此类广告框架的标志性高度) */
+    div[style*="99999998"] {
+        display: none !important;
+    }
+}
