@@ -1,14 +1,14 @@
 /* ==UserStyle==
 @name           露天电影网 (lutiandy) 广告净化
 @namespace      https://github.com/WGRJLYSYB/customise_tampermonkey_script/blob/master/lutiandy_ad_cleaner.user.css
-@version        1.1.0
-@description    深度清除露天电影网页面的顽固悬浮广告、底部悬浮框等恶意占位元素。新增针对 h1/h5 + 2147483647 z-index 赌博广告的专项规则。
+@version        1.2.0
+@description    深度清除露天电影网页面的顽固悬浮广告、底部悬浮框等恶意占位元素。修复域名匹配，强化针对 h1/h5 + 2147483647 z-index + tkmktpvhx4 赌博广告的规则。
 @author         Gavin Newsom
 @license        MIT
 @preprocessor   default
 ==/UserStyle== */
 
-@-moz-document domain("www.lutiandy.com") {
+@-moz-document domain("lutiandy.com") {
 
     /* ===================================================================
        第一章：深度净化顽固广告 (Ad Purification)
@@ -37,61 +37,109 @@
     }
 
     /* ===================================================================
-       第二章：新增 —— 针对 h1/h5 + z-index:2147483647 赌博广告
+       第二章：针对 h1/h5 + z-index:2147483647 赌博广告（当前主力）
        =================================================================== */
 
     /*
-     * 新广告特征（来自 bad.html）：
-     * 1. 滥用 <h1>/<h5> 标签做布局
+     * 当前广告特征（2026-09）：
+     * 1. 滥用 <h1>/<h5> 标签
      * 2. z-index: 2147483647（有符号32位最大值）
-     * 3. ID 前缀：swipercontainer / diantan / anshua / alabelbox / ababoxjia / iframeid
-     * 4. data-url 指向 tkmktpvhx4.com
-     * 5. 底部固定 200px 高度悬浮条 + 摇晃动画
-     * 6. iframe srcdoc 内嵌广告图（huiokcdn.com / honeybadger）
+     * 3. ID 前缀：swipercontainer / diantan / anshua / alabelbox / ababoxjia / iframeid / gsagewadw
+     * 4. class 含固定 wkey：8wDfWNGcigxTCYNL4CRuzK
+     * 5. data-url / script src 指向 tkmktpvhx4.com
+     * 6. 底部固定 200px 高度悬浮条 + 摇晃动画 shakegwegs*
+     * 7. iframe srcdoc 内嵌广告图（piko.huiokcdn.com / honeybadger）
      */
 
-    /* 策略四：狙击极端 z-index 2147483647（最稳，覆盖范围广） */
+    /* 策略四：狙击极端 z-index 2147483647（最稳兜底） */
     [style*="2147483647"],
     [style*="z-index:2147483647"],
     [style*="z-index: 2147483647"] {
         display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        height: 0 !important;
+        max-height: 0 !important;
+        overflow: hidden !important;
     }
 
-    /* 策略五：针对滥用的 h1 / h5 容器（高度约 200px 的底部悬浮条） */
+    /* 策略五：针对滥用的 h1 / h5 容器 */
     h1[style*="height: 200px"],
     h1[style*="max-height: 200px"],
     h5[style*="height: 200px"],
     h5[style*="max-height: 200px"],
     h5.swiper-container {
         display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        height: 0 !important;
+        max-height: 0 !important;
     }
 
-    /* 策略六：ID 前缀匹配（数字后缀会变，前缀相对稳定） */
+    /* 策略六：ID 前缀匹配（数字后缀会变） */
     [id^="swipercontainer"],
     [id^="diantan"],
     [id^="anshua"],
     [id^="alabelbox"],
     [id^="ababoxjia"],
     [id^="iframeid"],
-    [id*="gsagewadw"] {
+    [id^="gsagewadw"] {
         display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        height: 0 !important;
+        max-height: 0 !important;
     }
 
-    /* 策略七：data-url 特征（广告跳转域名） */
+    /* 策略七：固定 wkey class（广告脚本的核心标识） */
+    [class*="8wDfWNGcigxTCYNL4CRuzK"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        height: 0 !important;
+        max-height: 0 !important;
+    }
+
+    /* 策略八：data-url / 广告跳转域名 */
     [data-url*="tkmktpvhx4.com"] {
         display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
     }
 
-    /* 策略八：iframe 内嵌广告图特征（srcdoc 或 src 含广告 CDN） */
+    /* 策略九：iframe 内嵌广告图 */
     iframe[srcdoc*="huiokcdn.com"],
     iframe[srcdoc*="honeybadger"],
     iframe[id^="iframeid"] {
         display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        height: 0 !important;
+        max-height: 0 !important;
     }
 
-    /* 策略九：底部固定悬浮条通用兜底（position:fixed + bottom:0 + 高度约200px） */
+    /* 策略十：底部固定悬浮条通用兜底 */
     [style*="position: fixed"][style*="bottom: 0"][style*="height: 200px"],
-    [style*="position:fixed"][style*="bottom:0"][style*="height:200px"] {
+    [style*="position:fixed"][style*="bottom:0"][style*="height:200px"],
+    [style*="position: fixed"][style*="bottom: 0px"][style*="height: 200px"],
+    [style*="position:fixed"][style*="bottom:0px"][style*="height:200px"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        height: 0 !important;
+        max-height: 0 !important;
+    }
+
+    /* 策略十一：拦截广告脚本本身（防止重复注入） */
+    script[src*="tkmktpvhx4.com"],
+    script[id*="8wDfWNGcigxTCYNL4CRuzK"] {
         display: none !important;
     }
 }
