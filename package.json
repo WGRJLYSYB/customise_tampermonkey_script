@@ -1,0 +1,25 @@
+{
+  "name": "customise_tampermonkey_script",
+  "version": "1.0.0",
+  "description": "个人自定义油猴脚本集合，包含一些定制化的浏览器自动化和广告拦截工具。",
+  "main": "bilibili_sponsor_block_mobile.user.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WGRJLYSYB/customise_tampermonkey_script.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/WGRJLYSYB/customise_tampermonkey_script/issues"
+  },
+  "homepage": "https://github.com/WGRJLYSYB/customise_tampermonkey_script#readme",
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}

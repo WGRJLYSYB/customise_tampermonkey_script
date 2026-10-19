@@ -4,12 +4,22 @@
 // @namespace    https://github.com/WGRJLYSYB/customise_tampermonkey_script/blob/master/mobile_video_gamepad.user.js
 // @version      11.8
 // @description      针对移动端视频网站优化的虚拟控制手柄。里程碑版本：全指令化统一 UI（图标指示未来动作，圆环指示当前状态）。支持 iframe 跨域桥接与全屏自适应。
-// @author       Gavin Newsom
+// @author       WGRJLYSYB
 // @match        *://*/*
 // @grant        GM_addStyle
 // @run-at       document-start
-// @license      MIT
+// @license      AGPL-3.0
 // ==/UserScript==
+
+/*
+Custom Tampermonkey Scripts — Collection of custom browser automation and ad‑blocking userscripts
+Copyright (C) 2026 WGRJLYSYB
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License v3.0.
+See LICENSE file in repository root for full license text.
+*/
+
 
 (function () {
     'use strict';

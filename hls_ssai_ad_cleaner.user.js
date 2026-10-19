@@ -6,7 +6,7 @@
 // @description      专门针对 HLS (m3u8) 视频流的 SSAI 广告拦截工具。利用“递归 Blob 代理”技术和“动态帧率指纹”算法，深度净化主索引与变体索引，无损过滤隐藏广告。增加了安卓端原生播放降维接管支持。
 // @description:zh-CN 专门针对 HLS (m3u8) 视频流的 SSAI 广告拦截工具。利用“递归 Blob 代理”技术和“动态帧率指纹”算法，深度净化主索引与变体索引，无损过滤隐藏广告。
 // @description:en  Advanced SSAI ad cleaner for HLS (m3u8) streams. Uses "Recursive Blob Proxying" and "Dynamic Framerate Signature" to mathematically identify and remove ad segments without dropping main video frames.
-// @author       Gavin Newsom
+// @author       WGRJLYSYB
 // @match        *://*/*
 // @exclude      *://*.youtube.com/*
 // @exclude      *://*.bilibili.com/*
@@ -38,10 +38,20 @@
 // @exclude      *://*.instagram.com/*
 // @grant        none
 // @run-at       document-start
-// @license      MIT
+// @license      AGPL-3.0
 // @downloadURL https://update.greasyfork.org/scripts/574142/HLS%20SSAI%20Ad%20Cleaner%20%28Odd%20Discontinuity%29.user.js
 // @updateURL https://update.greasyfork.org/scripts/574142/HLS%20SSAI%20Ad%20Cleaner%20%28Odd%20Discontinuity%29.meta.js
 // ==/UserScript==
+
+/*
+Custom Tampermonkey Scripts — Collection of custom browser automation and ad‑blocking userscripts
+Copyright (C) 2026 WGRJLYSYB
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License v3.0.
+See LICENSE file in repository root for full license text.
+*/
+
 
 (function () {
     'use strict';

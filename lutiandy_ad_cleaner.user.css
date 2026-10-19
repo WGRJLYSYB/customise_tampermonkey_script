@@ -3,10 +3,20 @@
 @namespace      https://github.com/WGRJLYSYB/customise_tampermonkey_script/blob/master/lutiandy_ad_cleaner.user.css
 @version        1.2.0
 @description    深度清除露天电影网页面的顽固悬浮广告、底部悬浮框等恶意占位元素。修复域名匹配，强化针对 h1/h5 + 2147483647 z-index + tkmktpvhx4 赌博广告的规则。
-@author         Gavin Newsom
-@license        MIT
+@author       WGRJLYSYB
+@license      AGPL-3.0
 @preprocessor   default
 ==/UserStyle== */
+
+/*
+ *Custom Tampermonkey Scripts — Collection of custom browser automation and ad‑blocking userscripts
+ *Copyright (C) 2026 WGRJLYSYB
+ *
+ *This program is free software: you can redistribute it and/or modify
+ *it under the terms of the GNU Affero General Public License v3.0.
+ *See LICENSE file in repository root for full license text.
+ */
+
 
 @-moz-document domain("lutiandy.com") {
 

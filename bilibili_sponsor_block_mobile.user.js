@@ -4,15 +4,25 @@
 // @namespace    https://github.com/WGRJLYSYB/customise_tampermonkey_script/blob/master/bilibili_sponsor_block_mobile.user.js
 // @version      1.4
 // @description  基于 BSBSB 数据，自动跳过B站视频中的赞助广告、片头、片尾。适配多P分集，自动清理App诱导横幅。
-// @author       Gavin Newsom
+// @author       WGRJLYSYB
 // @match        *://*.bilibili.com/video/*
 // @match        *://m.bilibili.com/video/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_addStyle
 // @connect      bsbsb.top
 // @run-at       document-idle
-// @license      MIT
+// @license      AGPL-3.0
 // ==/UserScript==
+
+/*
+Custom Tampermonkey Scripts — Collection of custom browser automation and ad‑blocking userscripts
+Copyright (C) 2026 WGRJLYSYB
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License v3.0.
+See LICENSE file in repository root for full license text.
+*/
+
 
 (function () {
     'use strict';
