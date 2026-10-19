@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           露天电影网 (lutiandy) 广告净化
 @namespace      https://github.com/WGRJLYSYB/customise_tampermonkey_script/blob/master/lutiandy_ad_cleaner.user.css
-@version        1.2.0
+@version        1.2.1
 @description    深度清除露天电影网页面的顽固悬浮广告、底部悬浮框等恶意占位元素。修复域名匹配，强化针对 h1/h5 + 2147483647 z-index + tkmktpvhx4 赌博广告的规则。
 @author       WGRJLYSYB
 @license      AGPL-3.0

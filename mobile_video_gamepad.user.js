@@ -2,7 +2,7 @@
 // @name         Mobile Video Gamepad (Glass Edition)
 // @name:zh-CN   移动端视频“游戏手柄”控制器 (极简玻璃质感)
 // @namespace    https://github.com/WGRJLYSYB/customise_tampermonkey_script/blob/master/mobile_video_gamepad.user.js
-// @version      11.8
+// @version      11.8.1
 // @description      针对移动端视频网站优化的虚拟控制手柄。里程碑版本：全指令化统一 UI（图标指示未来动作，圆环指示当前状态）。支持 iframe 跨域桥接与全屏自适应。
 // @author       WGRJLYSYB
 // @match        *://*/*
