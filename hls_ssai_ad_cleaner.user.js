@@ -2,7 +2,7 @@
 // @name         HLS SSAI Ad Cleaner (Framerate Signature)
 // @name:zh-CN   HLS SSAI 广告过滤工具 (动态帧率指纹识别)
 // @namespace    https://github.com/WGRJLYSYB/customise_tampermonkey_script/blob/master/hls_ssai_ad_cleaner.user.js
-// @version      3.4.1
+// @version      3.4.2
 // @description      专门针对 HLS (m3u8) 视频流的 SSAI 广告拦截工具。利用“递归 Blob 代理”技术和“动态帧率指纹”算法，深度净化主索引与变体索引，无损过滤隐藏广告。增加了安卓端原生播放降维接管支持。
 // @description:zh-CN 专门针对 HLS (m3u8) 视频流的 SSAI 广告拦截工具。利用“递归 Blob 代理”技术和“动态帧率指纹”算法，深度净化主索引与变体索引，无损过滤隐藏广告。
 // @description:en  Advanced SSAI ad cleaner for HLS (m3u8) streams. Uses "Recursive Blob Proxying" and "Dynamic Framerate Signature" to mathematically identify and remove ad segments without dropping main video frames.
@@ -62,11 +62,84 @@ See LICENSE file in repository root for full license text.
     const ourBlobs = new Set();
 
     /**
+     * 从可能被播放器污染的畸形 URL 中提取并还原出真实的 Blob URL
+     * 解决播放器由于无法识别 blob: 协议而错误拼接 baseUrl 的问题
+     * 例如：https://B.com/.../blob:https://A.com/uuid -> blob:https://A.com/uuid
+     */
+    function extractBlobUrl(url) {
+        if (!url || typeof url !== 'string') return url;
+
+        // 1. 如果本身就是合法的 Blob URL
+        if (ourBlobs.has(url)) return url;
+
+        // 2. 检查是否包含了我们创建的 Blob（最精准，不受前缀和追加参数干扰）
+        for (const b of ourBlobs) {
+            if (url.includes(b)) {
+                return b;
+            }
+        }
+
+        // 3. 处理可能被 URL 编码的情况（如 blob%3Ahttps%3A%2F%2F...）
+        let target = url;
+        if (target.includes('blob%3A') || target.includes('blob%3a')) {
+            try { target = decodeURIComponent(target); } catch (_) {}
+            for (const b of ourBlobs) {
+                if (target.includes(b)) {
+                    return b;
+                }
+            }
+        }
+
+        // 4. 正则兜底提取任意嵌套的 blob: 协议 URL
+        const match = target.match(/(blob:https?:\/\/[^\s"'?#]+)/i);
+        if (match) {
+            return match[1];
+        }
+
+        return url;
+    }
+
+    /**
+     * 将 m3u8 切片或子流地址解析为完整的绝对 HTTP/HTTPS URL
+     * - 如果本身已经是绝对地址 (http:// 或 https://)，保持原样不重复处理
+     * - 如果是相对地址 (/path, seg.ts, //domain/seg.ts)，基于 baseUrl 解析为绝对地址
+     */
+    function toAbsoluteUrl(uri, baseUrl) {
+        if (!uri || typeof uri !== 'string') return uri;
+        const trimmed = uri.trim();
+        if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('blob:') || trimmed.startsWith('data:')) {
+            return uri;
+        }
+        // 如果本身已经是带协议的绝对地址，直接返回原地址
+        if (/^https?:\/\//i.test(trimmed)) {
+            return trimmed;
+        }
+        try {
+            return new URL(trimmed, baseUrl).href;
+        } catch (_) {
+            return uri;
+        }
+    }
+
+    /**
+     * 解析 m3u8 标签中包含的 URI 属性（如 #EXT-X-KEY, #EXT-X-MAP, #EXT-X-MEDIA）
+     * 确保 key/init 文件的相对地址也能正确转为绝对地址，绝对地址则保持不变
+     */
+    function resolveTagUris(line, baseUrl) {
+        if (!line || typeof line !== 'string' || !line.includes('URI=')) return line;
+        return line.replace(/URI="([^"]+)"/g, (match, uri) => {
+            return `URI="${toAbsoluteUrl(uri, baseUrl)}"`;
+        });
+    }
+
+    /**
      * 深度净化核心逻辑
-     * 原理：拦截主索引，同步递归净化所有子资源并转换为 Blob URL，从而绕过内核原生请求限制。
+     * 原理：拦截主索引，解析绝对地址；对实际切片列表进行“动态帧率指纹”无损去广告并转换为 Blob URL。
      */
     function getPurifiedUrlSync(url) {
-        if (!url || typeof url !== 'string' || url.startsWith('blob:') || url.startsWith('data:')) return url;
+        if (!url || typeof url !== 'string') return url;
+        url = extractBlobUrl(url);
+        if (url.startsWith('blob:') || url.startsWith('data:')) return url;
         if (!url.includes('m3u8')) return url;
 
         try {
@@ -86,8 +159,12 @@ See LICENSE file in repository root for full license text.
                     for (let line of lines) {
                         let t = line.trim();
                         if (t && !t.startsWith('#')) {
-                            const absUrl = new URL(t, url).href;
-                            newLines.push(getPurifiedUrlSync(absUrl));
+                            // 保持标准的绝对 HTTP URL，绝不要提前转 Blob！
+                            // 这样播放器解析 Master 时拿到的是 https:// 绝对地址，绝不会误判为相对路径去拼前缀；
+                            // 待播放器真正拉取该子清晰度流时，会被 XHR/fetch 拦截并按需净化。
+                            newLines.push(toAbsoluteUrl(t, url));
+                        } else if (t.startsWith('#')) {
+                            newLines.push(resolveTagUris(line, url));
                         } else {
                             newLines.push(line);
                         }
@@ -96,8 +173,8 @@ See LICENSE file in repository root for full license text.
                 } else if (hasAds) {
                     // 第一步：动态探测主视频的帧率 (FPS Signature)
                     // 盗版网站正片和广告的压制规格往往不同（例如正片是24fps，广告是30fps）
-                    const commonFps = [23.976, 24, 25, 29.97, 30, 50, 60];
-                    const fpsCounts = { 23.976: 0, 24: 0, 25: 0, 29.97: 0, 30: 0, 50: 0, 60: 0 };
+                    const commonFps = [22.999, 23.976, 24.0, 25.0, 29.97, 30.0, 50.0, 59.94, 60.0];
+                    const fpsCounts = Object.fromEntries(commonFps.map(item => [item, 0]));
 
                     let allDurs = [];
                     for (let line of lines) {
@@ -130,13 +207,18 @@ See LICENSE file in repository root for full license text.
                     let finalLines = [];
                     let currentBlock = [];
                     let isAdBlock = false;
+                    let hasEndList = false;
 
                     const flushBlock = () => {
                         if (currentBlock.length > 0) {
                             if (!isAdBlock) {
                                 for (let l of currentBlock) {
-                                    if (!l.startsWith('#') && !l.startsWith('http') && !l.startsWith('blob:') && !l.startsWith('data:')) {
-                                        finalLines.push(new URL(l, url).href);
+                                    let t = l.trim();
+                                    if (t && !t.startsWith('#')) {
+                                        // 处理 ts 切片地址（绝对地址直接保留，相对地址正确解析为绝对地址）
+                                        finalLines.push(toAbsoluteUrl(t, url));
+                                    } else if (t.startsWith('#')) {
+                                        finalLines.push(resolveTagUris(l, url));
                                     } else {
                                         finalLines.push(l);
                                     }
@@ -151,18 +233,26 @@ See LICENSE file in repository root for full license text.
                         let t = line.trim();
                         if (!t) continue;
 
-                        // 全局标签直接保留
+                        // 全局头部标签直接保留
                         if (t.startsWith('#EXTM3U') || t.startsWith('#EXT-X-VERSION') ||
                             t.startsWith('#EXT-X-TARGETDURATION') || t.startsWith('#EXT-X-MEDIA-SEQUENCE') ||
-                            t.startsWith('#EXT-X-PLAYLIST-TYPE') || t.startsWith('#EXT-X-ENDLIST')) {
+                            t.startsWith('#EXT-X-PLAYLIST-TYPE')) {
                             finalLines.push(t);
+                            continue;
+                        }
+
+                        // 标记结尾标签，必须在所有切片区块结算完成后放到最末尾
+                        if (t.startsWith('#EXT-X-ENDLIST')) {
+                            hasEndList = true;
                             continue;
                         }
 
                         // 遇到不连续标签，结算上一个 Block
                         if (t.startsWith('#EXT-X-DISCONTINUITY')) {
                             flushBlock();
-                            currentBlock = [t];
+                            // 如果前面已有切片，则保留该标签以提示播放器时间戳跳变；若前面无切片（如片头广告被删），则无需多余的 DISCONTINUITY
+                            const hasSegments = finalLines.some(l => l.startsWith('#EXTINF:'));
+                            currentBlock = hasSegments ? [t] : [];
                             isAdBlock = false;
                             continue;
                         }
@@ -181,13 +271,18 @@ See LICENSE file in repository root for full license text.
                         }
                     }
                     flushBlock(); // 处理最后一个区块
+                    if (hasEndList) {
+                        finalLines.push('#EXT-X-ENDLIST');
+                    }
 
                     content = finalLines.join('\n');
                 } else {
                     for (let line of lines) {
                         let t = line.trim();
-                        if (t && !t.startsWith('#') && !t.startsWith('http')) {
-                            newLines.push(new URL(t, url).href);
+                        if (t && !t.startsWith('#')) {
+                            newLines.push(toAbsoluteUrl(t, url));
+                        } else if (t.startsWith('#')) {
+                            newLines.push(resolveTagUris(line, url));
                         } else {
                             newLines.push(line);
                         }
@@ -207,7 +302,10 @@ See LICENSE file in repository root for full license text.
     }
 
     XMLHttpRequest.prototype.open = function (m, url, ...args) {
-        if (!this.isInternalRequest && typeof url === 'string' && url.includes('m3u8')) {
+        if (typeof url === 'string') {
+            url = extractBlobUrl(url);
+        }
+        if (!this.isInternalRequest && typeof url === 'string' && url.includes('m3u8') && !url.startsWith('blob:')) {
             url = getPurifiedUrlSync(url);
         }
         return oldXhrOpen.apply(this, [m, url, ...args]);
@@ -215,6 +313,11 @@ See LICENSE file in repository root for full license text.
 
     window.fetch = function (input, init) {
         let url = (input instanceof Request) ? input.url : String(input);
+        const cleanUrl = extractBlobUrl(url);
+        if (cleanUrl !== url) {
+            input = (input instanceof Request) ? new Request(cleanUrl, input) : cleanUrl;
+            url = cleanUrl;
+        }
         if (!init?.isInternal && url.includes('m3u8') && !url.startsWith('blob:')) {
             url = getPurifiedUrlSync(url);
             input = (input instanceof Request) ? new Request(url, input) : url;
@@ -312,6 +415,7 @@ See LICENSE file in repository root for full license text.
             get: function () { return desc.get.call(this); },
             set: function (val) {
                 if (val && typeof val === 'string') {
+                    val = extractBlobUrl(val);
                     if (val.includes('m3u8') && !val.startsWith('blob:')) {
                         val = getPurifiedUrlSync(val);
                     }
@@ -329,7 +433,8 @@ See LICENSE file in repository root for full license text.
     if (window.HTMLSourceElement) hijackProperty(HTMLSourceElement.prototype, 'src');
 
     function checkAndCleanEl(el) {
-        const currentSrc = el.getAttribute('src') || el.src;
+        let currentSrc = el.getAttribute('src') || el.src;
+        if (currentSrc) currentSrc = extractBlobUrl(currentSrc);
         if (currentSrc && currentSrc.includes('m3u8') && !currentSrc.startsWith('blob:') && !el.dataset.cleaned) {
             el.dataset.cleaned = "true";
             
