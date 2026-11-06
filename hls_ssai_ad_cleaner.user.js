@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name:zh-CN   葡萄广告拦截器
-// @description:zh-CN 专门针对 HLS (m3u8) 视频流的 SSAI 广告拦截工具。利用“递归 Blob 代理”技术和“动态帧率指纹”算法，深度净化主索引与变体索引，无损过滤隐藏广告。
-// @version      3.4.3
+// @name:   葡萄广告拦截器
+// @description: 专门针对 HLS (m3u8) 视频流的 SSAI 广告拦截工具。利用“递归 Blob 代理”技术和“动态帧率指纹”算法，深度净化主索引与变体索引，无损过滤隐藏广告。
+// @version      3.4.4
 // @author       WGRJLYSYB
 // @match        *://*/*
 // @exclude      *://*.youtube.com/*

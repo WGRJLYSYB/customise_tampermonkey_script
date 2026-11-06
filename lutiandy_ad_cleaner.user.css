@@ -1,6 +1,6 @@
 /* ==UserStyle==
-@name:zh-CN   葡萄页面广告清理器（露天）
-@description:zh-CN    深度清除露天电影网页面的顽固悬浮广告、底部悬浮框等恶意占位元素。修复域名匹配，强化针对 h1/h5 + 2147483647 z-index + tkmktpvhx4 赌博广告的规则。
+@name:   葡萄页面广告清理器（露天）
+@description:    深度清除露天电影网页面的顽固悬浮广告、底部悬浮框等恶意占位元素。修复域名匹配，强化针对 h1/h5 + 2147483647 z-index + tkmktpvhx4 赌博广告的规则。
 @version        1.2.2
 @author       WGRJLYSYB
 @preprocessor   default
