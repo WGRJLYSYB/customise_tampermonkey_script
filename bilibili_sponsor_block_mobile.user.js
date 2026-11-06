@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name:   葡萄推广拦截器（bilibili）
-// @description:  基于 BSBSB 数据，自动跳过B站视频中的赞助广告、片头、片尾。适配多P分集，自动清理App诱导横幅。
-// @version      1.4.3
+// @name   葡萄推广拦截器（bilibili）
+// @description  基于 BSBSB 数据，自动跳过B站视频中的赞助广告、片头、片尾。适配多P分集，自动清理App诱导横幅。
+// @version      1.4.4
 // @author       WGRJLYSYB
 // @match        *://*.bilibili.com/video/*
 // @match        *://m.bilibili.com/video/*
