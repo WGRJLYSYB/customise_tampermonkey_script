@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name   葡萄视频手柄控制器
+// @name   葡萄视频手柄控制器（移动端）
 // @description      针对移动端视频网站优化的虚拟控制手柄。里程碑版本：全指令化统一 UI（图标指示未来动作，圆环指示当前状态）。支持 iframe 跨域桥接与全屏自适应。
-// @version      11.8.4
+// @version      11.8.5
 // @author       WGRJLYSYB
 // @match        *://*/*
 // @grant        GM_addStyle
