@@ -1,9 +1,7 @@
 // ==UserScript==
-// @name         Bilibili SponsorBlock Mobile (Lite)
-// @name:zh-CN   B站自动跳过推广 (移动端精简版)
-// @namespace    https://github.com/WGRJLYSYB/customise_tampermonkey_script/blob/master/bilibili_sponsor_block_mobile.user.js
-// @version      1.4.1
-// @description  基于 BSBSB 数据，自动跳过B站视频中的赞助广告、片头、片尾。适配多P分集，自动清理App诱导横幅。
+// @name:zh-CN   葡萄推广拦截器（bilibili）
+// @description:zh-CN  基于 BSBSB 数据，自动跳过B站视频中的赞助广告、片头、片尾。适配多P分集，自动清理App诱导横幅。
+// @version      1.4.2
 // @author       WGRJLYSYB
 // @match        *://*.bilibili.com/video/*
 // @match        *://m.bilibili.com/video/*

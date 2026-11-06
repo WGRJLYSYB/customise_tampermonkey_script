@@ -1,11 +1,7 @@
 // ==UserScript==
-// @name         HLS SSAI Ad Cleaner (Framerate Signature)
-// @name:zh-CN   HLS SSAI 广告过滤工具 (动态帧率指纹识别)
-// @namespace    https://github.com/WGRJLYSYB/customise_tampermonkey_script/blob/master/hls_ssai_ad_cleaner.user.js
-// @version      3.4.2
-// @description      专门针对 HLS (m3u8) 视频流的 SSAI 广告拦截工具。利用“递归 Blob 代理”技术和“动态帧率指纹”算法，深度净化主索引与变体索引，无损过滤隐藏广告。增加了安卓端原生播放降维接管支持。
+// @name:zh-CN   葡萄广告拦截器
 // @description:zh-CN 专门针对 HLS (m3u8) 视频流的 SSAI 广告拦截工具。利用“递归 Blob 代理”技术和“动态帧率指纹”算法，深度净化主索引与变体索引，无损过滤隐藏广告。
-// @description:en  Advanced SSAI ad cleaner for HLS (m3u8) streams. Uses "Recursive Blob Proxying" and "Dynamic Framerate Signature" to mathematically identify and remove ad segments without dropping main video frames.
+// @version      3.4.3
 // @author       WGRJLYSYB
 // @match        *://*/*
 // @exclude      *://*.youtube.com/*
@@ -39,8 +35,6 @@
 // @grant        none
 // @run-at       document-start
 // @license      AGPL-3.0
-// @downloadURL https://update.greasyfork.org/scripts/574142/HLS%20SSAI%20Ad%20Cleaner%20%28Odd%20Discontinuity%29.user.js
-// @updateURL https://update.greasyfork.org/scripts/574142/HLS%20SSAI%20Ad%20Cleaner%20%28Odd%20Discontinuity%29.meta.js
 // ==/UserScript==
 
 /*
